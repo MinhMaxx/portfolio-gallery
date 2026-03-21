@@ -1,0 +1,20 @@
+{
+  "name": "portfolio-gallery",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Personal portfolio and photography gallery — AWS serverless architecture",
+  "workspaces": [
+    "frontend",
+    "backend",
+    "infra",
+    "lambdas/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:backend": "npm run build --workspace=backend",
+    "infra:deploy": "npm run deploy --workspace=infra",
+    "infra:synth": "npm run synth --workspace=infra"
+  }
+}
