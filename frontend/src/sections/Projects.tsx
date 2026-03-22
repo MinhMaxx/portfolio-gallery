@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
   Github,
-  Globe,
   Play,
   X,
   ChevronLeft,
