@@ -70,4 +70,42 @@ router.get("/categories", (_req, res) => {
   }
 });
 
+function saveCategories(map) {
+  fs.writeFileSync(CATEGORIES_FILE, JSON.stringify(map, null, 2), "utf-8");
+}
+
+function getFilenameByIndex(index) {
+  if (!fs.existsSync(PHOTO_DIR)) return null;
+  const files = fs
+    .readdirSync(PHOTO_DIR)
+    .filter((f) => /\.(jpe?g|png|webp)$/i.test(f))
+    .sort();
+  return files[index] || null;
+}
+
+router.put("/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const match = id.match(/^local-(\d+)$/);
+    if (!match) return res.status(404).json({ message: "Photo not found" });
+
+    const filename = getFilenameByIndex(parseInt(match[1]));
+    if (!filename) return res.status(404).json({ message: "Photo not found" });
+
+    const { tags } = req.body;
+    const tagMap = loadCategories();
+    tagMap[filename] = Array.isArray(tags) ? tags : [tags].filter(Boolean);
+    saveCategories(tagMap);
+
+    res.json({
+      _id: id,
+      title: "",
+      tags: tagMap[filename],
+      s3Key: `gallery/${filename}`,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;

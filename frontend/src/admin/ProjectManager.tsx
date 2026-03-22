@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback, useRef, type FormEvent } from "react";
 import { Plus, Trash2, Loader2, X, Pencil, Check } from "lucide-react";
 import api from "@/lib/api";
-import { getThumbnailUrl } from "@/lib/constants";
+import { getThumbnailUrl, getImageUrl } from "@/lib/constants";
 import ImageUploader from "./ImageUploader";
+import SortableTagList from "./components/SortableTagList";
 
 interface Screenshot {
   _id: string;
@@ -175,8 +176,8 @@ function ProjectForm({
 }) {
   const [name, setName] = useState(existing?.name || "");
   const [description, setDescription] = useState(existing?.description || "");
-  const [technologies, setTechnologies] = useState(
-    existing?.technologiesUsed.join(", ") || ""
+  const [technologies, setTechnologies] = useState<string[]>(
+    existing?.technologiesUsed || []
   );
   const [startDate, setStartDate] = useState(
     existing?.startDate ? existing.startDate.slice(0, 10) : ""
@@ -194,10 +195,7 @@ function ProjectForm({
     const payload = {
       name,
       description,
-      technologiesUsed: technologies
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
+      technologiesUsed: technologies,
       startDate,
       endDate: endDate || undefined,
       githubLink: githubLink || undefined,
@@ -247,12 +245,18 @@ function ProjectForm({
         onChange={(e) => setDescription(e.target.value)}
         className={`${inputClass} resize-none`}
       />
-      <input
-        placeholder="Technologies (comma-separated)"
-        value={technologies}
-        onChange={(e) => setTechnologies(e.target.value)}
-        className={inputClass}
-      />
+      <div className="mb-3">
+        <label className="text-xs text-text-muted mb-1.5 block">Technologies (drag to reorder)</label>
+        <SortableTagList
+          items={technologies}
+          onReorder={setTechnologies}
+          onRemove={(t) => setTechnologies((prev) => prev.filter((x) => x !== t))}
+          onAdd={(t) => {
+            if (!technologies.includes(t)) setTechnologies((prev) => [...prev, t]);
+          }}
+          placeholder="Add technology..."
+        />
+      </div>
       <div className="grid grid-cols-2 gap-3">
         <input
           type="date"
@@ -352,6 +356,13 @@ function ScreenshotUploader({
             >
               <img
                 src={getThumbnailUrl(ss.s3Key)}
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  if (!img.dataset.fallback) {
+                    img.dataset.fallback = "1";
+                    img.src = getImageUrl(ss.s3Key);
+                  }
+                }}
                 alt={ss.caption || "Screenshot"}
                 className="w-24 h-16 rounded object-cover shrink-0"
                 loading="lazy"

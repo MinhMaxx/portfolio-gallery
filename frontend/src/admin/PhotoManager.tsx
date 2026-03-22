@@ -1,20 +1,127 @@
-import { useState, useEffect, useCallback } from "react";
-import { Trash2, Loader2 } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { Trash2, Loader2, X, Hash } from "lucide-react";
 import api from "@/lib/api";
-import { getThumbnailUrl } from "@/lib/constants";
+import { getThumbnailUrl, getImageUrl } from "@/lib/constants";
 import ImageUploader from "./ImageUploader";
+import { cn } from "@/lib/utils";
 
 interface Photo {
   _id: string;
   title: string;
-  category: string;
+  tags: string[];
   s3Key: string;
+}
+
+function TagInput({
+  tags,
+  onChange,
+  placeholder = "Add tag...",
+  className,
+}: {
+  tags: string[];
+  onChange: (tags: string[]) => void;
+  placeholder?: string;
+  className?: string;
+}) {
+  const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const addTag = (raw: string) => {
+    const tag = raw.replace(/^#/, "").trim().toLowerCase();
+    if (tag && !tags.includes(tag)) onChange([...tags, tag]);
+    setInput("");
+  };
+
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap gap-1.5 items-center bg-surface-elevated border border-border rounded-lg px-3 py-2 cursor-text",
+        className,
+      )}
+      onClick={() => inputRef.current?.focus()}
+    >
+      {tags.map((t) => (
+        <span
+          key={t}
+          className="inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full bg-accent/10 text-accent"
+        >
+          #{t}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onChange(tags.filter((x) => x !== t));
+            }}
+            className="hover:text-red-400"
+          >
+            <X size={10} />
+          </button>
+        </span>
+      ))}
+      <input
+        ref={inputRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            addTag(input);
+          }
+          if (e.key === "Backspace" && !input && tags.length > 0) {
+            onChange(tags.slice(0, -1));
+          }
+        }}
+        onBlur={() => input.trim() && addTag(input)}
+        placeholder={tags.length === 0 ? placeholder : ""}
+        className="bg-transparent outline-none text-sm text-text-primary min-w-[80px] flex-1"
+      />
+    </div>
+  );
+}
+
+function PhotoTagEditor({
+  photo,
+  onSave,
+}: {
+  photo: Photo;
+  onSave: () => void;
+}) {
+  const [tags, setTags] = useState(photo.tags || []);
+  const [saving, setSaving] = useState(false);
+  const changed =
+    JSON.stringify(tags) !== JSON.stringify(photo.tags || []);
+
+  const save = async () => {
+    if (!changed) return;
+    setSaving(true);
+    try {
+      await api.put(`/photo/${photo._id}`, { tags });
+      onSave();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="p-2 space-y-2" onClick={(e) => e.stopPropagation()}>
+      <TagInput tags={tags} onChange={setTags} placeholder="#landscape" />
+      {changed && (
+        <button
+          onClick={save}
+          disabled={saving}
+          className="text-xs px-2 py-1 rounded bg-accent/10 text-accent hover:bg-accent/20 disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Tags"}
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function PhotoManager() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState("general");
+  const [uploadTags, setUploadTags] = useState<string[]>(["general"]);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchPhotos = useCallback(async () => {
     try {
@@ -37,7 +144,7 @@ export default function PhotoManager() {
         title: "",
         description: "",
       })),
-      category,
+      tags: uploadTags,
     };
     const res = await api.post("/photo/batch", payload);
     setTimeout(fetchPhotos, 1000);
@@ -57,16 +164,19 @@ export default function PhotoManager() {
       </h1>
 
       <div className="mb-6">
-        <label className="text-sm text-text-secondary block mb-2">
-          Upload category
+        <label className="flex items-center gap-1.5 text-sm text-text-secondary mb-2">
+          <Hash size={14} />
+          Upload tags
         </label>
-        <input
-          type="text"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          placeholder="e.g. landscape, street, portrait"
-          className="bg-surface border border-border rounded-lg px-4 py-2 text-text-primary text-sm w-64 focus:outline-none focus:border-accent"
+        <TagInput
+          tags={uploadTags}
+          onChange={setUploadTags}
+          placeholder="#landscape, #street, #portrait"
+          className="max-w-md"
         />
+        <p className="text-xs text-text-muted mt-1">
+          These tags will be applied to all photos in the next upload batch.
+        </p>
       </div>
 
       <ImageUploader onUpload={handleUpload} />
@@ -84,23 +194,54 @@ export default function PhotoManager() {
             >
               <img
                 src={getThumbnailUrl(photo.s3Key)}
+                onError={(e) => {
+                  const img = e.currentTarget;
+                  if (!img.dataset.fallback) {
+                    img.dataset.fallback = "1";
+                    img.src = getImageUrl(photo.s3Key);
+                  }
+                }}
                 alt={photo.title || "Photo"}
-                className="w-full aspect-square object-cover"
+                className="w-full aspect-square object-cover cursor-pointer"
                 loading="lazy"
+                onClick={() =>
+                  setEditingId(editingId === photo._id ? null : photo._id)
+                }
               />
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+              <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button
                   onClick={() => handleDelete(photo._id)}
-                  className="p-2 bg-red-500/80 rounded-full text-white hover:bg-red-500"
+                  className="p-1.5 bg-red-500/80 rounded-full text-white hover:bg-red-500"
                 >
-                  <Trash2 size={14} />
+                  <Trash2 size={12} />
                 </button>
               </div>
-              <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1">
-                <p className="text-white text-xs truncate capitalize">
-                  {photo.category}
-                </p>
-              </div>
+              {editingId !== photo._id && (
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 px-2 py-1 flex flex-wrap gap-1">
+                  {(photo.tags || []).map((t) => (
+                    <span
+                      key={t}
+                      className="text-white/90 text-[10px] leading-tight"
+                    >
+                      #{t}
+                    </span>
+                  ))}
+                  {(!photo.tags || photo.tags.length === 0) && (
+                    <span className="text-white/50 text-[10px] italic">
+                      no tags
+                    </span>
+                  )}
+                </div>
+              )}
+              {editingId === photo._id && (
+                <PhotoTagEditor
+                  photo={photo}
+                  onSave={() => {
+                    setEditingId(null);
+                    fetchPhotos();
+                  }}
+                />
+              )}
             </div>
           ))}
         </div>

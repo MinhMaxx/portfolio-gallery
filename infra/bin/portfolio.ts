@@ -11,4 +11,5 @@ new PortfolioStack(app, 'PortfolioStack', {
     region: 'ap-southeast-2',
   },
   domainName: 'bminhnguyen.dev',
+  certificateArn: 'arn:aws:acm:us-east-1:061051255024:certificate/f9c0090a-d173-4af2-99a2-913b368b3291',
 });

@@ -6,10 +6,12 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as s3n from "aws-cdk-lib/aws-s3-notifications";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import { Construct } from "constructs";
 
 interface PortfolioStackProps extends cdk.StackProps {
   domainName: string;
+  certificateArn?: string;
 }
 
 export class PortfolioStack extends cdk.Stack {
@@ -37,10 +39,7 @@ export class PortfolioStack extends cdk.Stack {
         {
           allowedHeaders: ["*"],
           allowedMethods: [s3.HttpMethods.PUT, s3.HttpMethods.POST],
-          allowedOrigins: [
-            `https://${props.domainName}`,
-            "http://localhost:5173",
-          ],
+          allowedOrigins: ["*"],
           maxAge: 3600,
         },
       ],
@@ -74,6 +73,11 @@ export class PortfolioStack extends cdk.Stack {
       s3.EventType.OBJECT_CREATED,
       new s3n.LambdaDestination(thumbnailLambda),
       { prefix: "work/originals/" },
+    );
+    imagesBucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED,
+      new s3n.LambdaDestination(thumbnailLambda),
+      { prefix: "projects/originals/" },
     );
 
     // ──────────────────────────────────────────────
@@ -121,8 +125,26 @@ export class PortfolioStack extends cdk.Stack {
     frontendBucket.grantRead(oai);
     imagesBucket.grantRead(oai);
 
+    const stripImagesPrefix = new cloudfront.Function(this, "StripImagesPrefix", {
+      functionName: "portfolio-strip-images-prefix",
+      code: cloudfront.FunctionCode.fromInline(`
+        function handler(event) {
+          event.request.uri = event.request.uri.replace(/^\\/images/, '');
+          return event.request;
+        }
+      `),
+    });
+
+    const certificate = props.certificateArn
+      ? acm.Certificate.fromCertificateArn(this, "SiteCert", props.certificateArn)
+      : undefined;
+
     const distribution = new cloudfront.Distribution(this, "Distribution", {
       defaultRootObject: "index.html",
+      ...(certificate && {
+        domainNames: [props.domainName, `www.${props.domainName}`],
+        certificate,
+      }),
       defaultBehavior: {
         origin: origins.S3BucketOrigin.withOriginAccessIdentity(
           frontendBucket,
@@ -158,6 +180,12 @@ export class PortfolioStack extends cdk.Stack {
             maxTtl: cdk.Duration.days(365),
             minTtl: cdk.Duration.days(1),
           }),
+          functionAssociations: [
+            {
+              function: stripImagesPrefix,
+              eventType: cloudfront.FunctionEventType.VIEWER_REQUEST,
+            },
+          ],
         },
       },
       errorResponses: [

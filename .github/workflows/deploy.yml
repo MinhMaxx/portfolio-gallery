@@ -68,15 +68,25 @@ jobs:
           echo "frontend_bucket=$FRONTEND_BUCKET" >> $GITHUB_OUTPUT
           echo "distribution_id=$DISTRIBUTION_ID" >> $GITHUB_OUTPUT
 
+      - name: Build old-portfolio demo
+        run: |
+          cd demos/old-portfolio && npm install && CI=false NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false npx react-scripts build
+
       - name: Sync frontend to S3
         run: |
           aws s3 sync frontend/dist s3://${{ steps.stack-outputs.outputs.frontend_bucket }} \
             --delete \
             --cache-control "public, max-age=31536000, immutable" \
             --exclude "index.html" \
-            --exclude "*.json"
+            --exclude "*.json" \
+            --exclude "demo/*"
           aws s3 cp frontend/dist/index.html s3://${{ steps.stack-outputs.outputs.frontend_bucket }}/index.html \
             --cache-control "public, max-age=0, must-revalidate"
+
+      - name: Sync demo to S3
+        run: |
+          aws s3 sync demos/old-portfolio/build s3://${{ steps.stack-outputs.outputs.frontend_bucket }}/demo/old-portfolio/ \
+            --cache-control "public, max-age=31536000, immutable"
 
       - name: Invalidate CloudFront cache
         run: |

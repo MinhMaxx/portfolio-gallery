@@ -95,7 +95,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 * {
@@ -123,29 +125,59 @@ body {
 }
 
 .text-sunrise {
-  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-sunrise-yellow) 0%,
+    var(--color-sunrise-amber) 30%,
+    var(--color-sunrise-orange) 60%,
+    var(--color-sunrise-coral) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .bg-sunrise {
-  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-sunrise-yellow) 0%,
+    var(--color-sunrise-amber) 30%,
+    var(--color-sunrise-orange) 60%,
+    var(--color-sunrise-coral) 100%
+  );
 }
 
 .border-sunrise {
-  border-image: linear-gradient(135deg, var(--color-sunrise-yellow), var(--color-sunrise-orange), var(--color-sunrise-coral)) 1;
+  border-image: linear-gradient(
+      135deg,
+      var(--color-sunrise-yellow),
+      var(--color-sunrise-orange),
+      var(--color-sunrise-coral)
+    )
+    1;
 }
 
 html.light .light-sunrise {
-  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-sunrise-yellow) 0%,
+    var(--color-sunrise-amber) 30%,
+    var(--color-sunrise-orange) 60%,
+    var(--color-sunrise-coral) 100%
+  );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 html.light .light-sunrise-stroke {
-  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%) !important;
+  background: linear-gradient(
+    135deg,
+    var(--color-sunrise-yellow) 0%,
+    var(--color-sunrise-amber) 30%,
+    var(--color-sunrise-orange) 60%,
+    var(--color-sunrise-coral) 100%
+  ) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: var(--color-bg) !important;

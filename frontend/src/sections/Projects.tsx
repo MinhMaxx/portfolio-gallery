@@ -158,6 +158,13 @@ export default function Projects() {
                       <div className="aspect-video overflow-hidden">
                         <img
                           src={getThumbnailUrl(project.screenshots![0].s3Key)}
+                          onError={(e) => {
+                            const img = e.currentTarget;
+                            if (!img.dataset.fallback) {
+                              img.dataset.fallback = "1";
+                              img.src = getImageUrl(project.screenshots![0].s3Key);
+                            }
+                          }}
                           alt={project.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
@@ -241,6 +248,13 @@ export default function Projects() {
                       <div className="aspect-video overflow-hidden">
                         <img
                           src={getThumbnailUrl(showcase.screenshots[0].s3Key)}
+                          onError={(e) => {
+                            const img = e.currentTarget;
+                            if (!img.dataset.fallback) {
+                              img.dataset.fallback = "1";
+                              img.src = getImageUrl(showcase.screenshots[0].s3Key);
+                            }
+                          }}
                           alt={showcase.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"

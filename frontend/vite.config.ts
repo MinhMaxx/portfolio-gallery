@@ -16,6 +16,11 @@ export default defineConfig({
         target: "http://localhost:3000",
         changeOrigin: true,
       },
+      "/demo": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (path) => `/api${path}`,
+      },
     },
     fs: {
       allow: [".", "../local-assets"],

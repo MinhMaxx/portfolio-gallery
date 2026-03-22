@@ -4,7 +4,6 @@ import {
   Briefcase,
   FolderOpen,
   LogOut,
-  Image as ImageIcon,
   Settings,
   Upload,
   FileText,
@@ -13,27 +12,28 @@ import {
   MapPin,
   Save,
   Code2,
-  Plus,
-  X,
+  LayoutGrid,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from "@/lib/api";
 import { getFileUrl } from "@/lib/constants";
 import PhotoManager from "./PhotoManager";
-import WorkShowcaseManager from "./WorkShowcaseManager";
 import ProjectManager from "./ProjectManager";
+import ExperienceManager from "./ExperienceManager";
+import HeroEditor from "./HeroEditor";
+import SortableTagList from "./components/SortableTagList";
 
 interface Props {
   onLogout: () => void;
 }
 
-type View = "photos" | "work" | "projects" | "experience" | "settings";
+type View = "photos" | "projects" | "experience" | "hero" | "settings";
 
 const navItems: { id: View; label: string; icon: React.ReactNode }[] = [
   { id: "photos", label: "Photos", icon: <Camera size={16} /> },
-  { id: "work", label: "Work Showcase", icon: <ImageIcon size={16} /> },
   { id: "projects", label: "Projects", icon: <FolderOpen size={16} /> },
   { id: "experience", label: "Experience", icon: <Briefcase size={16} /> },
+  { id: "hero", label: "Hero", icon: <LayoutGrid size={16} /> },
   { id: "settings", label: "Settings", icon: <Settings size={16} /> },
 ];
 
@@ -75,24 +75,15 @@ export default function AdminDashboard({ onLogout }: Props) {
 
       <main className="flex-1 p-8 overflow-y-auto">
         {view === "photos" && <PhotoManager />}
-        {view === "work" && <WorkShowcaseManager />}
         {view === "projects" && <ProjectManager />}
-        {view === "experience" && (
-          <ComingSoon label="Experience management coming soon" />
-        )}
+        {view === "experience" && <ExperienceManager />}
+        {view === "hero" && <HeroEditor />}
         {view === "settings" && <SiteSettings />}
       </main>
     </div>
   );
 }
 
-function ComingSoon({ label }: { label: string }) {
-  return (
-    <div className="flex items-center justify-center h-64 text-text-muted">
-      {label}
-    </div>
-  );
-}
 
 function SiteSettings() {
   const [resumeKey, setResumeKey] = useState<string | null>(null);
@@ -203,13 +194,12 @@ function SiteSettings() {
         </label>
       </div>
 
-      <LocationEditor />
-      <TechStackEditor />
+      
     </div>
   );
 }
 
-function LocationEditor() {
+export function LocationEditor() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("");
   const [lat, setLat] = useState("");
@@ -258,7 +248,7 @@ function LocationEditor() {
       : null;
 
   return (
-    <div className="bg-surface rounded-xl border border-border p-6 max-w-xl">
+    <div className="bg-surface rounded-xl border border-border p-6">
       <div className="flex items-center gap-2 mb-1">
         <MapPin size={18} className="text-accent" />
         <h3 className="text-lg font-semibold text-text-primary">Location</h3>
@@ -354,10 +344,9 @@ function LocationEditor() {
   );
 }
 
-function TechStackEditor() {
+export function TechStackEditor() {
   const [selected, setSelected] = useState<string[]>([]);
   const [allTech, setAllTech] = useState<string[]>([]);
-  const [customInput, setCustomInput] = useState("");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -369,22 +358,10 @@ function TechStackEditor() {
       })
       .catch(() => {});
     api
-      .get("/employment-history/tech/all")
-      .then((r) => setAllTech(r.data))
+      .get("/employment/tech/all")
+      .then((r) => setAllTech(Array.isArray(r.data) ? r.data : []))
       .catch(() => {});
   }, []);
-
-  const available = allTech.filter((t) => !selected.includes(t));
-
-  const addTech = (tech: string) => {
-    if (tech && !selected.includes(tech)) {
-      setSelected((prev) => [...prev, tech]);
-    }
-  };
-
-  const removeTech = (tech: string) => {
-    setSelected((prev) => prev.filter((t) => t !== tech));
-  };
 
   const handleSave = async () => {
     setSaving(true);
@@ -400,16 +377,8 @@ function TechStackEditor() {
     }
   };
 
-  const handleCustomAdd = () => {
-    const val = customInput.trim();
-    if (val) {
-      addTech(val);
-      setCustomInput("");
-    }
-  };
-
   return (
-    <div className="bg-surface rounded-xl border border-border p-6 max-w-xl mt-6">
+    <div className="bg-surface rounded-xl border border-border p-6 mt-6">
       <div className="flex items-center gap-2 mb-1">
         <Code2 size={18} className="text-accent" />
         <h3 className="text-lg font-semibold text-text-primary">
@@ -417,70 +386,25 @@ function TechStackEditor() {
         </h3>
       </div>
       <p className="text-sm text-text-muted mb-4">
-        Technologies shown on the homepage bento grid.
+        Drag to reorder. Technologies shown on the homepage bento grid.
       </p>
 
-      {selected.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {selected.map((tech) => (
-            <span
-              key={tech}
-              className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-full bg-accent/10 text-accent"
-            >
-              {tech}
-              <button
-                onClick={() => removeTech(tech)}
-                className="hover:text-red-400 transition-colors"
-              >
-                <X size={12} />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {available.length > 0 && (
-        <div className="mb-4">
-          <label className="text-xs text-text-muted mb-1.5 block">
-            Add from experience
-          </label>
-          <div className="flex flex-wrap gap-1.5">
-            {available.map((tech) => (
-              <button
-                key={tech}
-                onClick={() => addTech(tech)}
-                className="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-full bg-surface-elevated border border-border text-text-secondary hover:border-accent hover:text-accent transition-colors"
-              >
-                <Plus size={10} />
-                {tech}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="flex gap-2 mb-4">
-        <input
-          value={customInput}
-          onChange={(e) => setCustomInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleCustomAdd()}
-          placeholder="Add custom tech..."
-          className="flex-1 px-3 py-2 rounded-lg bg-surface-elevated border border-border text-sm text-text-primary focus:outline-none focus:ring-1 focus:ring-accent"
-        />
-        <button
-          onClick={handleCustomAdd}
-          disabled={!customInput.trim()}
-          className="px-3 py-2 rounded-lg bg-surface-elevated border border-border text-sm text-text-secondary hover:text-accent hover:border-accent transition-colors disabled:opacity-40"
-        >
-          <Plus size={14} />
-        </button>
-      </div>
+      <SortableTagList
+        items={selected}
+        onReorder={setSelected}
+        onRemove={(t) => setSelected((prev) => prev.filter((x) => x !== t))}
+        onAdd={(t) => {
+          if (!selected.includes(t)) setSelected((prev) => [...prev, t]);
+        }}
+        placeholder="Add custom tech..."
+        suggestions={allTech.filter((t) => !selected.includes(t))}
+      />
 
       <button
         onClick={handleSave}
         disabled={saving}
         className={cn(
-          "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors",
+          "inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors mt-4",
           saving
             ? "bg-surface-elevated text-text-muted cursor-wait"
             : saved

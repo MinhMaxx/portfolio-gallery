@@ -12,9 +12,6 @@ interface Project {
 
 function resolveDemoUrl(demoLink: string): string {
   if (demoLink.startsWith("http")) return demoLink;
-  if (import.meta.env.DEV && demoLink.startsWith("/api")) {
-    return `http://localhost:3000${demoLink}`;
-  }
   return demoLink;
 }
 
@@ -111,7 +108,7 @@ export default function ProjectDemoPage() {
           title={`${project.name} — Live Demo`}
           className={`w-full border-0 block ${fullscreen ? "" : "rounded-xl border border-border shadow-lg"}`}
           style={{ height: iframeHeight }}
-          sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+          sandbox="allow-scripts allow-popups allow-forms"
         />
       </div>
     </motion.div>

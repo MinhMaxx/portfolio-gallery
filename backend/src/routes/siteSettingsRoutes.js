@@ -3,7 +3,7 @@ const router = express.Router();
 const authenticateAdmin = require("../helpers/authMiddleware");
 const SiteSettings = require("../models/siteSettings");
 
-const PUBLIC_KEYS = ["location", "heroTechStack"];
+const PUBLIC_KEYS = ["location", "heroTechStack", "heroLayout", "socialLinks"];
 
 router.get("/:key", async (req, res) => {
   try {
