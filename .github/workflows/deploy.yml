@@ -41,14 +41,14 @@ jobs:
         run: |
           mkdir -p .lambda-build/backend
           cp -r backend/src .lambda-build/backend/
-          cp backend/package.json backend/package-lock.json .lambda-build/backend/
-          cd .lambda-build/backend && npm ci --omit=dev
+          cp backend/package.json .lambda-build/backend/
+          cd .lambda-build/backend && npm install --omit=dev
 
       - name: Bundle thumbnail-generator for Lambda
         run: |
           mkdir -p .lambda-build/thumbnail-generator
-          cp lambdas/thumbnail-generator/index.js lambdas/thumbnail-generator/package.json lambdas/thumbnail-generator/package-lock.json .lambda-build/thumbnail-generator/
-          cd .lambda-build/thumbnail-generator && npm ci --omit=dev
+          cp lambdas/thumbnail-generator/index.js lambdas/thumbnail-generator/package.json .lambda-build/thumbnail-generator/
+          cd .lambda-build/thumbnail-generator && npm install --omit=dev
 
       - name: CDK Deploy
         working-directory: infra
