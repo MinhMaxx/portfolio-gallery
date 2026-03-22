@@ -37,14 +37,6 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Install backend production deps
-        working-directory: backend
-        run: npm ci --omit=dev
-
-      - name: Install thumbnail-generator deps
-        working-directory: lambdas/thumbnail-generator
-        run: npm ci --omit=dev
-
       - name: CDK Deploy
         working-directory: infra
         run: npx cdk deploy --all --require-approval never
