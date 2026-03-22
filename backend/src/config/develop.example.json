@@ -1,0 +1,38 @@
+{
+  "develop": {
+    "name": "Personal Website Backend - Development Mode",
+    "port": 3000,
+    "mode": "Development",
+    "protocol": "http",
+    "serverUrl": "http://localhost:3000",
+    "serverUrlWebUrlLink": "http://localhost:3000",
+    "mongo": {
+      "host": "cluster0.xxxxx.mongodb.net",
+      "port": "",
+      "user": "your_mongo_user",
+      "password": "your_mongo_password",
+      "database": "your_database_name",
+      "additionalParameters": "retryWrites=true&w=majority"
+    },
+    "admin": {
+      "username": "admin",
+      "password": "$2b$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "notifyEmailAccount": {
+      "service": "hotmail",
+      "email": "your_email@hotmail.com",
+      "password": "your_email_password"
+    },
+    "contactEmail": "your_contact@gmail.com",
+    "jwtSecret": "change-me-to-a-random-secret",
+    "frontendUrlWebUrlLink": "http://localhost:5173",
+    "privateEmail": {
+      "enabled": "false",
+      "host": "mail.privateemail.com",
+      "port": "465",
+      "user": "contact@yourdomain.com",
+      "password": "your_private_email_password",
+      "secure": "true"
+    }
+  }
+}

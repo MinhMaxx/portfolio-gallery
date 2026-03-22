@@ -44,6 +44,15 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/tech/all", async (_req, res) => {
+  try {
+    const techs = await EmploymentHistory.distinct("techStack");
+    res.json(techs.filter(Boolean).sort());
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching tech stack" });
+  }
+});
+
 // Fetch a specific employment history by ID
 router.get("/:id", async (req, res) => {
   try {

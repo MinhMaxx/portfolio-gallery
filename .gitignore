@@ -6,10 +6,14 @@ dist/
 build/
 cdk.out/
 
-# Environment
+# Environment & secrets
 .env
 .env.local
 .env.*.local
+backend/src/config/develop.json
+
+# Handoff doc (contains credentials)
+HANDOFF.md
 
 # AWS
 .aws-sam/
@@ -20,6 +24,10 @@ cdk.out/
 *.swp
 *.swo
 .DS_Store
+
+# Local assets (photos, certificates, project screenshots)
+local-assets/
+assets/
 
 # Logs
 *.log

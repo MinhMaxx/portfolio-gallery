@@ -124,6 +124,24 @@ router.delete("/:id", authMiddleware, async (req, res) => {
   }
 });
 
+router.patch("/:id/screenshots/:screenshotId", authMiddleware, async (req, res) => {
+  try {
+    const showcase = await WorkShowcase.findById(req.params.id);
+    if (!showcase) return res.status(404).json({ message: "Not found" });
+
+    const screenshot = showcase.screenshots.id(req.params.screenshotId);
+    if (!screenshot) return res.status(404).json({ message: "Screenshot not found" });
+
+    if (req.body.caption !== undefined) screenshot.caption = req.body.caption;
+    if (req.body.order !== undefined) screenshot.order = req.body.order;
+    await showcase.save();
+
+    res.json(showcase);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 router.delete("/:id/screenshots/:screenshotId", authMiddleware, async (req, res) => {
   try {
     const showcase = await WorkShowcase.findById(req.params.id);

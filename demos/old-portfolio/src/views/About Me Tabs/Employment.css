@@ -1,0 +1,30 @@
+/* Applying general styles to the employment section */
+.employment {
+  background-color: transparent; /* Applying a background color for contrast */
+}
+
+/* Styles for the vertical timeline elements */
+.vertical-timeline-element-title {
+  color: #fad233 !important; /* Setting the color for the titles in the timeline */
+  font-size: 22px !important;
+  font-family: "Roboto-Bold", sans-serif;
+}
+
+.vertical-timeline-element-subtitle {
+  color: white; /* Setting the color for the subtitles */
+  font-size: 16px !important;
+  font-family: "Roboto-Regular", sans-serif;
+}
+
+.vertical-timeline-element-date {
+  font-size: 20px !important;
+  color: #fad233 !important; /* Setting the color for the date in the timeline */
+  font-family: "Roboto-Bold", sans-serif;
+}
+
+/* Additional styles to adjust the spacing and layout */
+.vertical-timeline-element-content {
+  text-align: left;
+  padding-left: 20px !important; /* Adding padding to the left to separate the content from the border */
+  background-color: #23272e !important; /* Applying a background color for contrast */
+}

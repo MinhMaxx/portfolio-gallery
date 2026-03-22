@@ -24,6 +24,10 @@ const certificateSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  fileKey: {
+    type: String,
+    trim: true,
+  },
 });
 
 module.exports = mongoose.model("Certificate", certificateSchema);

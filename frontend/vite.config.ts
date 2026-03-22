@@ -17,5 +17,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    fs: {
+      allow: [".", "../local-assets"],
+    },
   },
+  publicDir: "public",
 });

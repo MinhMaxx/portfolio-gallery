@@ -1,0 +1,68 @@
+/* Customizing the Navbar appearance */
+.navbar {
+  background-color: #282a36 !important;
+  padding: 0 1rem !important;
+  font-family: "Roboto-Regular", sans-serif;
+}
+
+/* Adjusting the brand image size */
+.navbar-brand img {
+  height: auto;
+  width: auto;
+  max-height: 40px;
+}
+
+/* Style adjustments for navigation links */
+.nav-link {
+  font-size: 1.2rem !important;
+  padding: 0.5rem !important;
+  transition: color 0.3s ease-in-out;
+}
+
+/* Ensuring social icons display in a row */
+.social-icons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Custom style for social media nav links */
+.navbar .nav-link {
+  padding: 0 !important;
+  margin: 0 10px;
+}
+
+/* Style for inline display of nav links in collapsed navbar */
+.navbar-collapse .nav-link {
+  display: inline-block !important;
+}
+
+/* FontAwesome icons style */
+.nav-link .fa {
+  font-size: 20px;
+}
+
+/* LinkedIn icon hover effect */
+.nav-link:hover .fa-linkedin-square {
+  color: #0077b5 !important;
+}
+
+/* GitHub icon hover effect */
+.nav-link:hover .fa-github {
+  color: #7dbbe6 !important;
+}
+
+/* Instagram icon hover effect */
+.nav-link:hover .fa-instagram {
+  background: linear-gradient(
+    45deg,
+    #405de6,
+    #5851db,
+    #833ab4,
+    #c13584,
+    #e1306c,
+    #fd1d1d
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent !important;
+}

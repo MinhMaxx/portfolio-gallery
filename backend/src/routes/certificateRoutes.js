@@ -24,6 +24,16 @@ const certificateValidation = [
     .optional({ checkFalsy: true })
     .isURL()
     .withMessage("Link must be a valid URL"),
+  body("description")
+    .optional({ checkFalsy: true })
+    .isString()
+    .withMessage("Description must be a string")
+    .trim(),
+  body("fileKey")
+    .optional({ checkFalsy: true })
+    .isString()
+    .withMessage("File key must be a string")
+    .trim(),
 ];
 
 // Fetch all certificates

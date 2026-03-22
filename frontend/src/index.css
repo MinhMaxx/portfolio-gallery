@@ -1,29 +1,174 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Geist";
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-400-normal.woff2")
+    format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-500-normal.woff2")
+    format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-700-normal.woff2")
+    format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist";
+  src: url("https://cdn.jsdelivr.net/fontsource/fonts/geist-sans@latest/latin-900-normal.woff2")
+    format("woff2");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @theme {
-  --color-background: #0a0a0b;
-  --color-surface: #141416;
-  --color-surface-hover: #1c1c1f;
-  --color-border: #27272a;
-  --color-text-primary: #fafafa;
-  --color-text-secondary: #a1a1aa;
-  --color-text-muted: #71717a;
-  --color-accent: #3b82f6;
-  --color-accent-hover: #2563eb;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-bg: #050505;
+  --color-surface: #0a0a0a;
+  --color-surface-hover: #111111;
+  --color-border: #1a1a1a;
+  --color-border-light: #2a2a2a;
+  --color-text: #f5f5f5;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
+  --color-accent: #f59e0b;
+  --color-accent-hover: #d97706;
+  --color-sunrise-yellow: #facc15;
+  --color-sunrise-amber: #fb923c;
+  --color-sunrise-orange: #f97316;
+  --color-sunrise-coral: #ef4444;
+  --font-sans: "Geist", system-ui, -apple-system, sans-serif;
+}
+
+html.light {
+  --color-bg: #fafaf9;
+  --color-surface: #ffffff;
+  --color-surface-hover: #f5f5f4;
+  --color-border: #e7e5e4;
+  --color-border-light: #d6d3d1;
+  --color-text: #0c0a09;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #a8a29e;
+  --color-accent: #ea580c;
+  --color-accent-hover: #c2410c;
+  --color-sunrise-yellow: #eab308;
+  --color-sunrise-amber: #ea580c;
+  --color-sunrise-orange: #dc2626;
+  --color-sunrise-coral: #be123c;
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+  color: var(--color-text);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-light);
 }
 
 ::selection {
   background-color: var(--color-accent);
   color: white;
+}
+
+.text-sunrise {
+  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-sunrise {
+  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%);
+}
+
+.border-sunrise {
+  border-image: linear-gradient(135deg, var(--color-sunrise-yellow), var(--color-sunrise-orange), var(--color-sunrise-coral)) 1;
+}
+
+html.light .light-sunrise {
+  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html.light .light-sunrise-stroke {
+  background: linear-gradient(135deg, var(--color-sunrise-yellow) 0%, var(--color-sunrise-amber) 30%, var(--color-sunrise-orange) 60%, var(--color-sunrise-coral) 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: var(--color-bg) !important;
+  -webkit-text-stroke: 3px transparent !important;
+}
+
+/* noise grain overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+html.light body::before {
+  opacity: 0.02;
+}
+
+html.light body {
+  -webkit-font-smoothing: auto;
 }

@@ -1,0 +1,106 @@
+.projects {
+  margin-top: 80px;
+  color: white; /* Text color */
+  background-color: #282a32; /* Added background color */
+  padding: 10px;
+  font-family: "Roboto-Regular", sans-serif;
+}
+
+.projects h1 {
+  font-family: "RenogareSoft-Regular", sans-serif;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.projects p {
+  font-size: 20px;
+  padding-bottom: 10px;
+}
+
+/* Styling the project cards */
+.project-card {
+  background-color: #23272e !important;
+  border: none !important;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.project-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.project-link:hover {
+  text-decoration: none;
+}
+
+.project-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.project-card .card-subtitle {
+  font-family: "Roboto-Bold", sans-serif;
+}
+
+.project-card .card-subtitle,
+.project-card .card-text {
+  color: white !important;
+  font-size: 16px;
+}
+
+.project-card .card-title {
+  color: #fad233;
+  font-family: "Roboto-Bold", sans-serif;
+  font-size: 22px;
+}
+
+.project-card .card-text {
+  text-align: left;
+}
+
+.technologies {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+/* Style for each technology tag */
+.tech-tag {
+  display: inline-block;
+  background-color: #282a36;
+  color: white !important;
+  border-radius: 4px;
+  padding: 5px 10px;
+  margin: 2px 5px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+/* Styles for the icons within the technology tags */
+.tech-tag svg {
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* Style for View Project Button */
+.project-card .btn {
+  background-color: #fad027;
+  color: white;
+  font-family: "Roboto-Bold", sans-serif;
+  border-color: transparent;
+}
+
+/* Hover and active states for button */
+.project-card .btn:hover {
+  background-color: #ffa041;
+  color: white;
+  border-color: transparent;
+}
+.project-card .btn:active {
+  background-color: #ff7c4a !important;
+  color: white;
+  border-color: transparent !important;
+}

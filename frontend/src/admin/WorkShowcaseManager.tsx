@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, type FormEvent } from "react";
-import { Plus, Trash2, Loader2, X } from "lucide-react";
+import { useState, useEffect, useCallback, useRef, type FormEvent } from "react";
+import { Plus, Trash2, Loader2, X, Pencil, Check } from "lucide-react";
 import api from "@/lib/api";
 import { getThumbnailUrl } from "@/lib/constants";
 import ImageUploader from "./ImageUploader";
@@ -213,6 +213,10 @@ function ScreenshotUploader({
   screenshots: { _id: string; s3Key: string; caption: string }[];
   onUpdate: () => void;
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [captionDraft, setCaptionDraft] = useState("");
+  const captionRef = useRef<HTMLInputElement>(null);
+
   const handleUpload = async (files: File[]) => {
     const results = await Promise.all(
       files.map(async (f) => {
@@ -234,28 +238,93 @@ function ScreenshotUploader({
     onUpdate();
   };
 
+  const startEditing = (ss: { _id: string; caption: string }) => {
+    setEditingId(ss._id);
+    setCaptionDraft(ss.caption || "");
+    setTimeout(() => captionRef.current?.focus(), 50);
+  };
+
+  const saveCaption = async (screenshotId: string) => {
+    await api.patch(
+      `/work-showcase/${showcaseId}/screenshots/${screenshotId}`,
+      { caption: captionDraft }
+    );
+    setEditingId(null);
+    onUpdate();
+  };
+
   return (
     <div>
       <ImageUploader onUpload={handleUpload} />
       {screenshots.length > 0 && (
-        <div className="grid grid-cols-4 gap-2 mt-4">
+        <div className="space-y-3 mt-4">
           {screenshots.map((ss) => (
             <div
               key={ss._id}
-              className="relative group rounded-lg overflow-hidden"
+              className="flex items-start gap-3 bg-background rounded-lg p-3 border border-border"
             >
               <img
                 src={getThumbnailUrl(ss.s3Key)}
                 alt={ss.caption || "Screenshot"}
-                className="w-full aspect-video object-cover"
+                className="w-24 h-16 rounded object-cover shrink-0"
                 loading="lazy"
               />
-              <button
-                onClick={() => handleDeleteScreenshot(ss._id)}
-                className="absolute top-1 right-1 p-1 bg-red-500/80 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <Trash2 size={10} />
-              </button>
+              <div className="flex-1 min-w-0">
+                {editingId === ss._id ? (
+                  <div className="flex gap-2">
+                    <input
+                      ref={captionRef}
+                      value={captionDraft}
+                      onChange={(e) => setCaptionDraft(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveCaption(ss._id);
+                        if (e.key === "Escape") setEditingId(null);
+                      }}
+                      placeholder="Add a description for this image..."
+                      className="flex-1 bg-surface border border-border rounded px-3 py-1.5 text-sm text-text-primary focus:outline-none focus:border-accent"
+                    />
+                    <button
+                      onClick={() => saveCaption(ss._id)}
+                      className="p-1.5 text-green-400 hover:text-green-300"
+                    >
+                      <Check size={14} />
+                    </button>
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="p-1.5 text-text-muted hover:text-text-primary"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-start justify-between gap-2">
+                    <p
+                      className={`text-sm cursor-pointer ${
+                        ss.caption
+                          ? "text-text-secondary"
+                          : "text-text-muted italic"
+                      }`}
+                      onClick={() => startEditing(ss)}
+                    >
+                      {ss.caption || "Click to add description..."}
+                    </p>
+                    <div className="flex gap-1 shrink-0">
+                      <button
+                        onClick={() => startEditing(ss)}
+                        className="p-1 text-text-muted hover:text-accent"
+                      >
+                        <Pencil size={12} />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteScreenshot(ss._id)}
+                        className="p-1 text-text-muted hover:text-red-400"
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ))}
         </div>

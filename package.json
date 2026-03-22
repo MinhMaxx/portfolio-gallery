@@ -10,11 +10,16 @@
     "lambdas/*"
   ],
   "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:backend": "npm run dev --workspace=backend",
     "build:frontend": "npm run build --workspace=frontend",
-    "build:backend": "npm run build --workspace=backend",
+    "build:demo": "cd demos/old-portfolio && npm install && CI=false NODE_OPTIONS=--openssl-legacy-provider GENERATE_SOURCEMAP=false npx react-scripts build",
+    "setup": "cp -n backend/src/config/develop.example.json backend/src/config/develop.json 2>/dev/null; mkdir -p local-assets/gallery local-assets/certificates local-assets/projects/originals; npm install && echo '\\nSetup complete! Edit backend/src/config/develop.json with your credentials, then run: npm run dev'",
     "infra:deploy": "npm run deploy --workspace=infra",
     "infra:synth": "npm run synth --workspace=infra"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

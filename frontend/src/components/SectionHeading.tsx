@@ -20,7 +20,7 @@ export default function SectionHeading({ title, subtitle }: Props) {
       {subtitle && (
         <p className="mt-2 text-text-secondary text-lg">{subtitle}</p>
       )}
-      <div className="mt-4 h-1 w-16 bg-accent rounded-full" />
+      <div className="mt-4 h-1 w-16 bg-sunrise rounded-full" />
     </motion.div>
   );
 }

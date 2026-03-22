@@ -5,6 +5,10 @@ const employmentHistorySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  companyDescription: {
+    type: String,
+    trim: true,
+  },
   position: {
     type: String,
     required: true,
@@ -19,6 +23,14 @@ const employmentHistorySchema = new mongoose.Schema({
   },
   description: {
     type: String,
+  },
+  highlights: {
+    type: [String],
+    default: [],
+  },
+  techStack: {
+    type: [String],
+    default: [],
   },
 });
 

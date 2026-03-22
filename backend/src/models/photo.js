@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const photoSchema = new mongoose.Schema({
   title: { type: String, trim: true, default: "" },
   description: { type: String, trim: true, default: "" },
-  category: { type: String, trim: true, default: "general" },
+  tags: [{ type: String, trim: true }],
   s3Key: { type: String, required: true },
   thumbnailKey: { type: String, default: "" },
   width: { type: Number, default: 0 },

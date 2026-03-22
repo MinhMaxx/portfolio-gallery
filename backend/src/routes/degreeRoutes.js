@@ -16,13 +16,22 @@ const degreeValidation = [
     .optional({ checkFalsy: true })
     .isDate()
     .withMessage("End Date must be a valid date"),
-  body("description").not().isEmpty().withMessage("Description is required"),
+  body("description")
+    .optional({ checkFalsy: true })
+    .isString()
+    .withMessage("Description must be a string")
+    .trim(),
+  body("link")
+    .optional({ checkFalsy: true })
+    .isString()
+    .withMessage("Link must be a string")
+    .trim(),
 ];
 
 // Fetch all degrees
 router.get("/", async (req, res) => {
   try {
-    const degrees = await Degree.find().sort({ startDate: 1 }); // Sort degrees by startDate in ascending order
+    const degrees = await Degree.find().sort({ startDate: -1 });
     res.json(degrees);
   } catch (err) {
     res.status(500).send("Error fetching degrees");

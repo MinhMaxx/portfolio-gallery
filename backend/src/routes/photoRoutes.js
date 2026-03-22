@@ -8,7 +8,7 @@ const { generateKey, getThumbnailKey, getPresignedUploadUrl, deleteImageWithThum
 router.get("/", async (req, res) => {
   try {
     const { category, page = 1, limit = 50 } = req.query;
-    const filter = category && category !== "all" ? { category } : {};
+    const filter = category && category !== "all" ? { tags: category } : {};
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const [photos, total] = await Promise.all([
@@ -24,8 +24,8 @@ router.get("/", async (req, res) => {
 
 router.get("/categories", async (_req, res) => {
   try {
-    const categories = await Photo.distinct("category");
-    res.json(categories);
+    const tags = await Photo.distinct("tags");
+    res.json(tags);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -45,14 +45,14 @@ router.post(
     }
 
     try {
-      const { filename, contentType, title, description, category, takenAt } = req.body;
+      const { filename, contentType, title, description, tags, takenAt } = req.body;
       const s3Key = generateKey("photos", filename);
       const uploadUrl = await getPresignedUploadUrl(s3Key, contentType);
 
       const photo = new Photo({
         title: title || "",
         description: description || "",
-        category: category || "general",
+        tags: tags || ["general"],
         s3Key,
         thumbnailKey: getThumbnailKey(s3Key),
         takenAt: takenAt || null,
@@ -77,7 +77,7 @@ router.post(
     }
 
     try {
-      const { files, category } = req.body;
+      const { files, tags } = req.body;
 
       const results = await Promise.all(
         files.map(async (file) => {
@@ -86,7 +86,7 @@ router.post(
           const photo = new Photo({
             title: file.title || "",
             description: file.description || "",
-            category: category || "general",
+            tags: tags || ["general"],
             s3Key,
             thumbnailKey: getThumbnailKey(s3Key),
           });
@@ -104,10 +104,10 @@ router.post(
 
 router.put("/:id", authMiddleware, async (req, res) => {
   try {
-    const { title, description, category, takenAt } = req.body;
+    const { title, description, tags, takenAt } = req.body;
     const photo = await Photo.findByIdAndUpdate(
       req.params.id,
-      { title, description, category, takenAt },
+      { title, description, tags, takenAt },
       { new: true }
     );
     if (!photo) return res.status(404).json({ message: "Photo not found" });

@@ -28,6 +28,10 @@ const degreeSchema = new mongoose.Schema({
     type: String,
     trim: true,
   },
+  link: {
+    type: String,
+    trim: true,
+  },
 });
 
 const Degree = mongoose.model("Degree", degreeSchema);

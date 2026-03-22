@@ -1,73 +1,77 @@
 const fs = require("fs");
 const path = require("path");
 
-// Set the current environment, defaulting to "develop" if not explicitly set
+require("dotenv").config({ path: path.join(__dirname, "../../../.env") });
+
 const env = process.env.NODE_ENV || "develop";
 
+let currentConfig = null;
+
 const configFile = path.join(__dirname, "../config", `${env}.json`);
-const rawData = fs.readFileSync(configFile, "utf-8");
-const configData = JSON.parse(rawData);
-const currentConfig = configData[env];
+try {
+  const rawData = fs.readFileSync(configFile, "utf-8");
+  const configData = JSON.parse(rawData);
+  currentConfig = configData[env];
+} catch (err) {
+  if (err.code === "ENOENT") {
+    const exampleFile = path.join(__dirname, "../config/develop.example.json");
+    const hasExample = fs.existsSync(exampleFile);
+    console.warn(
+      `\n⚠  Config file not found: config/${env}.json\n` +
+        `   The backend will fall back to environment variables.\n` +
+        (hasExample
+          ? `   To create a config file, run:\n     cp backend/src/config/develop.example.json backend/src/config/develop.json\n   Then fill in your credentials.\n`
+          : `   See .env.example for the required variables.\n`)
+    );
+  } else {
+    console.error(`Failed to parse config/${env}.json:`, err.message);
+  }
+}
 
-// Exporting various functions to fetch specific configuration values
+function get(envVar, configPath) {
+  if (process.env[envVar]) return process.env[envVar];
+  if (!currentConfig) return undefined;
+  return configPath.split(".").reduce((obj, key) => obj?.[key], currentConfig);
+}
+
 module.exports = {
-  // Fetch application name
-  getAppName: () => process.env.NAME || currentConfig.name,
-  // Fetch port number
-  getPort: () => process.env.PORT || currentConfig.port,
-  // Fetch mode (e.g. development or production)
-  getMode: () => process.env.MODE || currentConfig.mode,
-  // Fetch the protocol (e.g. http or https)
-  getProtocol: () => process.env.PROTOCOL || currentConfig.protocol,
-  // Fetch the server URL
-  getServerUrl: () => process.env.SERVER_URL || currentConfig.serverUrl,
-  // Fetch the server web URL link
+  getAppName: () => get("NAME", "name"),
+  getPort: () => get("PORT", "port") || 3000,
+  getMode: () => get("MODE", "mode") || env,
+  getProtocol: () => get("PROTOCOL", "protocol") || "http",
+  getServerUrl: () => get("SERVER_URL", "serverUrl"),
   getServerWebUrlLink: () =>
-    process.env.SERVER_URL_WEB_URL_LINK || currentConfig.serverUrlWebUrlLink,
-  // Fetch MongoDB specific configurations
+    get("SERVER_URL_WEB_URL_LINK", "serverUrlWebUrlLink"),
   getMongoConfig: () => ({
-    host: process.env.MONGO_HOST || currentConfig.mongo.host,
-    port: process.env.MONGO_PORT || currentConfig.mongo.port,
-    user: process.env.MONGO_USER || currentConfig.mongo.user,
-    password: process.env.MONGO_PASSWORD || currentConfig.mongo.password,
-    database: process.env.MONGO_DATABASE || currentConfig.mongo.database,
-    additionalParameters:
-      process.env.MONGO_ADDITIONAL_PARAMETERS ||
-      currentConfig.mongo.additionalParameters,
+    host: get("MONGO_HOST", "mongo.host"),
+    port: get("MONGO_PORT", "mongo.port"),
+    user: get("MONGO_USER", "mongo.user"),
+    password: get("MONGO_PASSWORD", "mongo.password"),
+    database: get("MONGO_DATABASE", "mongo.database"),
+    additionalParameters: get(
+      "MONGO_ADDITIONAL_PARAMETERS",
+      "mongo.additionalParameters"
+    ),
   }),
-  // Fetch admin credentials (username and password)
   getAdminCredentials: () => ({
-    username: process.env.ADMIN_USERNAME || currentConfig.admin.username,
-    password: process.env.ADMIN_PASSWORD || currentConfig.admin.password,
+    username: get("ADMIN_USERNAME", "admin.username"),
+    password: get("ADMIN_PASSWORD", "admin.password"),
   }),
-  // Fetch notification email account details (service, email, password)
   getNotifyEmailAccount: () => ({
-    service:
-      process.env.NOTIFY_EMAIL_SERVICE ||
-      currentConfig.notifyEmailAccount.service,
-    email: process.env.NOTIFY_EMAIL || currentConfig.notifyEmailAccount.email,
-    password:
-      process.env.NOTIFY_EMAIL_PASSWORD ||
-      currentConfig.notifyEmailAccount.password,
+    service: get("NOTIFY_EMAIL_SERVICE", "notifyEmailAccount.service"),
+    email: get("NOTIFY_EMAIL", "notifyEmailAccount.email"),
+    password: get("NOTIFY_EMAIL_PASSWORD", "notifyEmailAccount.password"),
   }),
-  // Fetch the contact email address
-  getContactEmail: () =>
-    process.env.CONTACT_EMAIL || currentConfig.contactEmail,
-  getJwtSecret: () => process.env.JWT_SECRET || currentConfig.jwtSecret, // Added method to get JWT secret
+  getContactEmail: () => get("CONTACT_EMAIL", "contactEmail"),
+  getJwtSecret: () => get("JWT_SECRET", "jwtSecret"),
   getFrontendWebUrlLink: () =>
-    process.env.FRONTEND_URL_WEB_URL_LINK ||
-    currentConfig.frontendUrlWebUrlLink, // Added method to get frontend URL
-
-  // Private email service
+    get("FRONTEND_URL_WEB_URL_LINK", "frontendUrlWebUrlLink"),
   getPrivateEmailService: () => ({
-    enabled:
-      process.env.PRIVATE_EMAIL_ENABLED || currentConfig.privateEmail.enabled,
-    host: process.env.PRIVATE_EMAIL_HOST || currentConfig.privateEmail.host,
-    port: process.env.PRIVATE_EMAIL_PORT || currentConfig.privateEmail.port,
-    user: process.env.PRIVATE_EMAIL_USER || currentConfig.privateEmail.user,
-    password:
-      process.env.PRIVATE_EMAIL_PASSWORD || currentConfig.privateEmail.password,
-    secure:
-      process.env.PRIVATE_EMAIL_SECURE || currentConfig.privateEmail.secure,
+    enabled: get("PRIVATE_EMAIL_ENABLED", "privateEmail.enabled"),
+    host: get("PRIVATE_EMAIL_HOST", "privateEmail.host"),
+    port: get("PRIVATE_EMAIL_PORT", "privateEmail.port"),
+    user: get("PRIVATE_EMAIL_USER", "privateEmail.user"),
+    password: get("PRIVATE_EMAIL_PASSWORD", "privateEmail.password"),
+    secure: get("PRIVATE_EMAIL_SECURE", "privateEmail.secure"),
   }),
 };
