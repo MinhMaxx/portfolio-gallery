@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { GridLayout, type LayoutItem, verticalCompactor, useContainerWidth } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import {
-  Plus,
   Trash2,
   Save,
   Loader2,
