@@ -37,6 +37,14 @@ jobs:
         working-directory: frontend
         run: npm run build
 
+      - name: Bundle backend for Lambda
+        working-directory: backend
+        run: npm install --omit=dev --install-strategy=nested
+
+      - name: Bundle thumbnail-generator for Lambda
+        working-directory: lambdas/thumbnail-generator
+        run: npm install --omit=dev --install-strategy=nested
+
       - name: CDK Deploy
         working-directory: infra
         run: npx cdk deploy --all --require-approval never
