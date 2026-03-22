@@ -53,7 +53,7 @@ export class PortfolioStack extends cdk.Stack {
       functionName: "portfolio-thumbnail-generator",
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "index.handler",
-      code: lambda.Code.fromAsset("../lambdas/thumbnail-generator"),
+      code: lambda.Code.fromAsset("../.lambda-build/thumbnail-generator"),
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
       environment: {
@@ -83,7 +83,7 @@ export class PortfolioStack extends cdk.Stack {
       functionName: "portfolio-api",
       runtime: lambda.Runtime.NODEJS_20_X,
       handler: "src/lambda.handler",
-      code: lambda.Code.fromAsset("../backend"),
+      code: lambda.Code.fromAsset("../.lambda-build/backend"),
       memorySize: 512,
       timeout: cdk.Duration.seconds(30),
       environment: {

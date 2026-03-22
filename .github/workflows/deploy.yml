@@ -38,12 +38,17 @@ jobs:
         run: npm run build
 
       - name: Bundle backend for Lambda
-        working-directory: backend
-        run: npm install --omit=dev --install-strategy=nested
+        run: |
+          mkdir -p .lambda-build/backend
+          cp -r backend/src .lambda-build/backend/
+          cp backend/package.json backend/package-lock.json .lambda-build/backend/
+          cd .lambda-build/backend && npm ci --omit=dev
 
       - name: Bundle thumbnail-generator for Lambda
-        working-directory: lambdas/thumbnail-generator
-        run: npm install --omit=dev --install-strategy=nested
+        run: |
+          mkdir -p .lambda-build/thumbnail-generator
+          cp lambdas/thumbnail-generator/index.js lambdas/thumbnail-generator/package.json lambdas/thumbnail-generator/package-lock.json .lambda-build/thumbnail-generator/
+          cd .lambda-build/thumbnail-generator && npm ci --omit=dev
 
       - name: CDK Deploy
         working-directory: infra
